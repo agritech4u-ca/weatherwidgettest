@@ -109,7 +109,9 @@ function getWeather(lat, lon) {
         div.className = "card";
 
         div.innerHTML = `
-          <div>${day}</div>
+          <div>
+  ${new Date(day).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+</div>
           <div class="icon">${getWeatherIcon(codes[i])}</div>
           <div class="temp">${maxTemps[i]}°C</div>
           <div>Min: ${minTemps[i]}°C</div>
