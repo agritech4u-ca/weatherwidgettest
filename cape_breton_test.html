@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cape Breton Weather Forecast</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+  }
+
+  h1 {
+    margin-bottom: 10px;
+  }
+
+  #city {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-bottom: 20px;
+  }
+
+  #weather {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 15px;
+    width: 140px;
+  }
+
+  .temp {
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .icon {
+    font-size: 30px;
+    margin: 5px 0;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🌤 Cape Breton Weather</h1>
+<div id="city">Cape Breton, NS, Canada</div>
+<div id="weather"></div>
+
+<script>
+const weatherDiv = document.getElementById("weather");
+
+// Simple weather icons based on Open-Meteo weather codes
+function getWeatherIcon(code) {
+  if (code === 0) return "☀️";
+  if (code <= 3) return "⛅";
+  if (code <= 48) return "🌫";
+  if (code <= 67) return "🌧";
+  if (code <= 77) return "❄️";
+  if (code <= 99) return "⛈";
+  return "❔";
+}
+
+// Fetch weather forecast for Cape Breton
+function getWeather() {
+  const lat = 46.208062;   // Cape Breton latitude
+  const lon = -60.258435;  // Cape Breton longitude
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&current_weather=true&timezone=auto`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const days = data.daily.time;
+      const maxTemps = data.daily.temperature_2m_max;
+      const minTemps = data.daily.temperature_2m_min;
+      const rain = data.daily.precipitation_probability_max;
+      const codes = data.daily.weathercode;
+      const feelsLike = data.current_weather.temperature;
+
+      weatherDiv.innerHTML = "";
+
+      days.forEach((day, i) => {
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+          <div class="icon">${getWeatherIcon(codes[i])}</div>
+          <div class="temp">${maxTemps[i]}°C</div>
+          <div>Min: ${minTemps[i]}°C</div>
+          <div>🌧 ${rain[i]}%</div>
+          ${i === 0 ? `<div style="margin-top:5px;">Feels: ${feelsLike}°C</div>` : ""}
+        `;
+        weatherDiv.appendChild(div);
+      });
+    })
+    .catch(err => {
+      weatherDiv.innerHTML = "<p>Unable to load weather data.</p>";
+      console.error(err);
+    });
+}
+
+// Load forecast
+getWeather();
+</script>
+
+</body>
+</html>
