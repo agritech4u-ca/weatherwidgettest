@@ -80,10 +80,18 @@ function getCity(lat, lon) {
   fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}`)
     .then(res => res.json())
     .then(data => {
-      const place = data.results?.[0];
-      if (place) {
+      console.log("Geo Data:", data); // debug log to check the API response
+
+      if (data.results && data.results.length > 0) {
+        const place = data.results[0];
         locationDiv.textContent = `${place.name}, ${place.country}`;
+      } else {
+        locationDiv.textContent = "Location found";
       }
+    })
+    .catch(err => {
+      console.error(err);
+      locationDiv.textContent = "Location unavailable";
     });
 }
 
